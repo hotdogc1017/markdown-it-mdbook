@@ -1,0 +1,27 @@
+{
+  "name": "markdown-it-mdbook",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "keywords": [
+    "markdown-it",
+    "mdbook",
+    "markdown",
+    "md",
+    "markdown-it-mdbook"
+  ],
+  "author": "hotdogc1017@gmail.com",
+  "license": "MIT",
+  "packageManager": "pnpm@10.12.1",
+  "type": "module",
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@types/markdown-it-container": "^2.0.10",
+    "markdown-it": "^14.1.0",
+    "markdown-it-container": "^4.0.0",
+    "vitest": "^3.2.4"
+  }
+}

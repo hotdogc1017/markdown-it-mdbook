@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`parseInfo > test parseInfo 1`] = `
+{
+  "hidelines": "!!!",
+  "lang": "python",
+}
+`;
+
+exports[`parseInfo > test parseInfo with nothing 1`] = `
+{
+  "lang": "python",
+}
+`;
+
+exports[`parseInfo > test parseInfo with playground 1`] = `
+{
+  "hidelines": "!!!",
+  "lang": "python",
+}
+`;
+
+exports[`parseInfo > test parseInfo with playground and hidelines 1`] = `
+{
+  "hidelines": "!!!",
+  "lang": "python",
+}
+`;
