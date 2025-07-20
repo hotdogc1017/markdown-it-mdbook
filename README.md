@@ -37,3 +37,5 @@ export default defineConfig({
 - [ ] HTML classes provided by mdBook
 
 The features listed above can be viewed in [mdBook](https://rust-lang.github.io/mdBook/format/mdbook.html)
+
+Note: The feature list above is not in release order.
