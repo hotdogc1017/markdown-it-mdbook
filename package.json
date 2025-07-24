@@ -18,8 +18,10 @@
   "packageManager": "pnpm@10.12.1",
   "type": "module",
   "devDependencies": {
+    "@mdit/helper": "^0.22.1",
     "@types/markdown-it": "^14.1.2",
     "@types/markdown-it-container": "^2.0.10",
+    "@types/node": "^24.0.15",
     "markdown-it": "^14.1.0",
     "markdown-it-container": "^4.0.0",
     "vitest": "^3.2.4"

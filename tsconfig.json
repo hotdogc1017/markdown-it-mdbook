@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ESNext"],
+    "target": "ESNext",
     "types": ["vitest/importMeta"]
   },
   "include": ["src", "vitest.config.ts"],

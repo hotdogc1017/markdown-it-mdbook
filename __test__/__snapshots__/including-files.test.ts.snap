@@ -1,0 +1,49 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Rust file tests > find lines test 1`] = `
+[
+  "    hello: f32,",
+  "}",
+  "",
+  "impl System for MySystem { ... }",
+]
+`;
+
+exports[`Rust file tests > find lines test 2`] = `
+[
+  "struct Paddle {",
+  "    hello: f32,",
+  "impl System for MySystem { ... }",
+  "",
+]
+`;
+
+exports[`Rust file tests > find lines with anchor test 1`] = `
+[
+  "struct Paddle {",
+  "    hello: f32,",
+  "}",
+]
+`;
+
+exports[`Rust file tests > find lines with anchor test 2`] = `
+[
+  "impl System for MySystem { ... }",
+]
+`;
+
+exports[`Rust file tests > find lines with anchor test 3`] = `
+[
+  "",
+  "// ANCHOR: component",
+  "struct Paddle {",
+  "    hello: f32,",
+  "}",
+  "// ANCHOR_END: component",
+  "",
+  "////////// ANCHOR: system",
+  "impl System for MySystem { ... }",
+  "////////// ANCHOR_END: system",
+  "",
+]
+`;
