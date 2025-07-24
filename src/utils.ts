@@ -1,3 +1,4 @@
+import Renderer from "markdown-it/lib/renderer.mjs";
 import StateBlock from "markdown-it/lib/rules_block/state_block.mjs";
 import Token from "markdown-it/lib/token.mjs";
 
@@ -9,7 +10,13 @@ interface CreateBlockRuleParserOptions {
 }
 
 export type ParserArgs = [StateBlock, number, number, boolean];
-export type RenderArgs<T = any, E = any> = [TokenWithMeta<T>[], number, any, E];
+export type RenderArgs<T = any, E = any> = [
+  TokenWithMeta<T>[],
+  number,
+  any,
+  E,
+  Renderer,
+];
 
 /**
  * Specify the type of meta in the token for content
@@ -43,13 +50,13 @@ export function createBlockRuleParser({
     return true;
   }
   const line = state.src.slice(pos, max);
-  const match = syntaxMatcher(line);
+  const match = syntaxMatcher?.(line);
   if (!match) {
     return false;
   }
   const token = state.push(ruleName, "", 1) as TokenWithMeta;
   token.map = [startLine, startLine + 1];
-  token.src = { match };
+  token.src = match;
   setToken?.(token, match);
 
   state.line = startLine + 1;

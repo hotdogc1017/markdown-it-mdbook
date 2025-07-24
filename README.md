@@ -29,9 +29,9 @@ export default defineConfig({
 - [x] Hiding code lines
 - [ ] Rust Playground
 - [ ] Rust code block attributes
-- [ ] Including files
-- [ ] Including portions of a file
-- [ ] Including a file but initially hiding all except specified lines
+- [x] Including files
+- [x] Including portions of a file
+- [x] Including a file but initially hiding all except specified lines
 - [ ] Inserting runnable Rust files
 - [ ] Controlling page title
 - [ ] HTML classes provided by mdBook

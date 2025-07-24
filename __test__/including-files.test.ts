@@ -4,11 +4,13 @@ import {
   syntaxMatcher,
   findLines,
   findLinesWithAnchor,
-} from "../src/if";
+  includingFilesPlugin,
+} from "../src/including-files";
+import MarkdownIt from "markdown-it";
 import fs from "node:fs";
 import path from "node:path";
 
-describe("Rust file tests", () => {
+describe("Regexp and utils tests", () => {
   test("regexp test", () => {
     /* prettier-ignore */
     const SYNTAX_SOURCES = {
@@ -83,5 +85,27 @@ describe("Rust file tests", () => {
     expect(findLinesWithAnchor(lines, "component")).toMatchSnapshot();
     expect(findLinesWithAnchor(lines, "system")).toMatchSnapshot();
     expect(findLinesWithAnchor(lines, "all")).toMatchSnapshot();
+  });
+});
+
+describe("including-files plugin test", () => {
+  const testSourceFilepath = path.resolve(
+    import.meta.dirname,
+    "fixtures",
+    "including-files.md",
+  );
+  const source = fs.readFileSync(testSourceFilepath, { encoding: "utf8" });
+  test("output html without the `cwd` in env", () => {
+    const md = new MarkdownIt({ html: true });
+    md.use(includingFilesPlugin);
+    const html = md.render(source);
+    expect(html).toMatchSnapshot();
+  });
+
+  test("output html with the `cwd` in env", () => {
+    const md = new MarkdownIt({ html: true });
+    md.use(includingFilesPlugin);
+    const html = md.render(source, { cwd: testSourceFilepath });
+    expect(html).toMatchSnapshot();
   });
 });

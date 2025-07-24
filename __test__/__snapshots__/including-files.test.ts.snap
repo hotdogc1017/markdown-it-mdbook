@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Rust file tests > find lines test 1`] = `
+exports[`Regexp and utils tests > find lines test 1`] = `
 [
   "    hello: f32,",
   "}",
@@ -9,7 +9,7 @@ exports[`Rust file tests > find lines test 1`] = `
 ]
 `;
 
-exports[`Rust file tests > find lines test 2`] = `
+exports[`Regexp and utils tests > find lines test 2`] = `
 [
   "struct Paddle {",
   "    hello: f32,",
@@ -18,7 +18,7 @@ exports[`Rust file tests > find lines test 2`] = `
 ]
 `;
 
-exports[`Rust file tests > find lines with anchor test 1`] = `
+exports[`Regexp and utils tests > find lines with anchor test 1`] = `
 [
   "struct Paddle {",
   "    hello: f32,",
@@ -26,13 +26,13 @@ exports[`Rust file tests > find lines with anchor test 1`] = `
 ]
 `;
 
-exports[`Rust file tests > find lines with anchor test 2`] = `
+exports[`Regexp and utils tests > find lines with anchor test 2`] = `
 [
   "impl System for MySystem { ... }",
 ]
 `;
 
-exports[`Rust file tests > find lines with anchor test 3`] = `
+exports[`Regexp and utils tests > find lines with anchor test 3`] = `
 [
   "",
   "// ANCHOR: component",
@@ -46,4 +46,55 @@ exports[`Rust file tests > find lines with anchor test 3`] = `
   "////////// ANCHOR_END: system",
   "",
 ]
+`;
+
+exports[`including-files plugin test > output html with the \`cwd\` in env 1`] = `
+"<pre><code class="language-rs">}</code></pre>
+<pre><code class="language-rs">struct Paddle {
+    hello: f32,
+}
+
+impl System for MySystem { ... }
+</code></pre>
+<pre><code class="language-rs">}
+
+impl System for MySystem { ... }
+</code></pre>
+<pre><code class="language-rs">}
+
+impl System for MySystem { ... }
+</code></pre>
+<p>Here is a component:</p>
+<pre><code class="language-rs">struct Paddle {
+    hello: f32,
+}</code></pre>
+<p>Here is a system:</p>
+<pre><code class="language-rs">impl System for MySystem { ... }</code></pre>
+<p>This is the full file.</p>
+<pre><code class="language-rs">
+// ANCHOR: component
+struct Paddle {
+    hello: f32,
+}
+// ANCHOR_END: component
+
+////////// ANCHOR: system
+impl System for MySystem { ... }
+////////// ANCHOR_END: system
+</code></pre>
+"
+`;
+
+exports[`including-files plugin test > output html without the \`cwd\` in env 1`] = `
+"<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<p>Here is a component:</p>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files_with_anchor.rs</code></pre>
+<p>Here is a system:</p>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files_with_anchor.rs</code></pre>
+<p>This is the full file.</p>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files_with_anchor.rs</code></pre>
+"
 `;

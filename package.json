@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:update": "vitest -u"
   },
   "keywords": [
     "markdown-it",

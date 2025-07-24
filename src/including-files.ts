@@ -1,197 +1,207 @@
-/**
- * With the exception of the test directory, nearly all the code is sourced from https://github.com/mdit-plugins/mdit-plugins/tree/main/packages/include/src
- * modified only to change the regular expression for the include syntax
- * A heartfelt thank you to all the owners and contributors of the original project
- *
- * 几乎所有代码（除测试目录内的代码以外）都来自于https://github.com/mdit-plugins/mdit-plugins/tree/main/packages/include/src
- * 仅仅修改了包含语法规则应用时的正则表达式
- * 向此项目的所有者&贡献者表示诚挚的感谢
- */
-
-import fs from "node:fs";
-import path from "node:path";
-
-import { NEWLINE_RE, dedent } from "@mdit/helper";
-import type { PluginWithOptions } from "markdown-it";
+import {
+  createBlockRuleParser,
+  type ParserArgs,
+  type RenderArgs,
+  type TokenWithMeta,
+} from "./utils";
+import MarkdownIt from "markdown-it";
+import Token from "markdown-it/lib/token.mjs";
 import type { RuleBlock } from "markdown-it/lib/parser_block.mjs";
-import type { RuleCore } from "markdown-it/lib/parser_core.mjs";
-import type Token from "markdown-it/lib/token.mjs";
-
-export interface MarkdownItIncludeOptions {
-  currentPath: (env: IncludeEnv) => string;
-  resolvePath?: (path: string, cwd: string | null) => string;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface IncludeEnv extends Record<string, any> {
-  /** included current paths */
-  includedPaths?: string[];
-  /** included files */
-  includedFiles?: string[];
-}
-
-interface ImportFileLineInfo {
-  filePath: string;
-  lineStart?: number;
-  lineEnd?: number;
-}
-
-interface ImportFileRegionInfo {
-  filePath: string;
-  region: string;
-}
-
-type ImportFileInfo = ImportFileLineInfo | ImportFileRegionInfo;
-
-interface IncludeInfo {
-  cwd: string | null;
-}
+import path from "node:path";
+import fs from "node:fs";
 
 /**
  * Rust needs to be supported for now.
+ *
+ * Captures: [anchor_tag, anchor]
  */
-const REGIONS_RE = [
-  /^\/\/ ?#?(ANCHOR(?:_END)?):\s*([\w_-]+)$/, // javascript, typescript, java
-  /^\/\* ?#(ANCHOR(?:_END)?):\s*([\w_-]+) ?\*\/$/, // css, less, scss
-  /^#pragma (ANCHOR(?:_END)?):\s*([\w_-]+)$/, // C, C++
-  /^<!-- #?(ANCHOR(?:_END)?):\s*([\w_-]+) -->$/, // HTML, markdown
-  /^#(ANCHOR(?:_END )):\s*([\w_-]+)$/, // Visual Basic
-  /^::#(ANCHOR(?:_END)):\s*([\w_-]+)$/, // Bat
-  /^# ?(ANCHOR(?:_END)?):\s*([\w_-]+)$/, // C#, PHP, Powershell, Python, perl & misc
-  /^\/\/+\s?(ANCHOR(?:_END)?):\s*([\w_-]+)$/, // Rust
-  /^\/\*\s?(ANCHOR(?:_END)?):\s*([\w_-]+)$/, // Rust
+const ANCHOR_RE_LIST = [
+  /^\/\/+ #?(ANCHOR(?:_END)?): ([a-zA-Z]+)$/, // javascript, typescript, java, Rust
+  /^\/\* ?#(ANCHOR(?:_END)?): ([a-zA-Z]+) ?\*\/$/, // css, less, scss
+  /^#pragma (ANCHOR(?:_END)?): ([a-zA-Z]+)$/, // C, C++
+  /^<!-- #?(ANCHOR(?:_END)?): ([a-zA-Z]+) -->$/, // HTML, markdown
+  /^#(ANCHOR(?:_END )): ([a-zA-Z]+)$/, // Visual Basic
+  /^::#(ANCHOR(?:_END)): ([a-zA-Z]+)$/, // Bat
+  /^# ?(ANCHOR(?:_END)?): ([a-zA-Z]+)$/, // C#, PHP, Powershell, Python, perl & misc
+  /^\/\* (ANCHOR(?:_END)?): ([a-zA-Z]+) \*\/$/, // Rust
 ];
 
-// regexp to match the import syntax
+/**
+ * Captures: [filepath, lang, anchor, startLine, endLine]
+ */
 export const INCLUDE_RE =
-  /^(\s*)\{{2}#include\s([^<>|:"*?]+(?:\.[a-z0-9]+)):?([a-zA-Z]+)?(?:(\d+)?:?(\d+)?)?\}{2}\s*$/m;
+  /^\s*\{{2}#include\s([^<>|:"*?]+(?:\.([a-z0-9]+)))(?::?([a-zA-Z]+))?(:\d*)?(:\d*)?\}{2}\s*$/;
 
-const testLine = (
-  line: string,
-  regexp: RegExp,
-  regionName: string,
-  end = false,
-): boolean => {
-  const [full, tag, name] = regexp.exec(line.trim()) ?? [];
-  return Boolean(
-    full &&
-      tag &&
-      name === regionName &&
-      tag.match(end ? /^ANCHOR_END$/ : /^ANCHOR$/),
-  );
-};
+export function includingFilesPlugin(md: MarkdownIt) {
+  type MatchResult = ReturnType<typeof syntaxMatcher>;
+  const ruleName = "fence";
 
-const findRegion = (
-  lines: string[],
-  regionName: string,
-): { lineStart: number; lineEnd: number } | null => {
-  let regexp = null;
-  let lineStart = -1;
+  const setToken = (token: TokenWithMeta<MatchResult>, match: MatchResult) => {
+    token.markup = "```";
+    // TODO: Compatible vitepress
+    token.info = `${match.lang}`;
+    token.content = match.filepath;
+  };
 
-  for (const [lineId, line] of lines.entries())
-    if (regexp === null) {
-      for (const reg of REGIONS_RE)
-        if (testLine(line, reg, regionName)) {
-          lineStart = lineId + 1;
-          regexp = reg;
-          break;
-        }
-    } else if (testLine(line, regexp, regionName, true)) {
-      return { lineStart, lineEnd: lineId };
-    }
+  const parser = (...args: ParserArgs) => {
+    return createBlockRuleParser({
+      ruleName,
+      syntaxMatcher,
+      originalArgs: args,
+      setToken,
+    });
+  };
 
-  return null;
-};
+  const fenceRender = md.renderer.rules["fence"]!;
+  const render = (...args: RenderArgs<MatchResult, { cwd: string }>) => {
+    const [tokens, idx, , env] = args;
+    const token = tokens[idx];
+    const { src } = token;
 
-export const handleInclude = (
-  info: ImportFileInfo,
-  { cwd }: IncludeInfo,
-): string => {
-  const { filePath } = info;
-  let realPath = filePath;
-
-  if (!path.isAbsolute(filePath)) {
-    // if the importPath is relative path, we need to resolve it
-    // according to the markdown filePath
-    if (!cwd) {
-      console.error(`Error when resolving path: ${filePath}`);
-
-      return "\nError when resolving path\n";
-    }
-
-    realPath = path.resolve(cwd, filePath);
-  }
-
-  if (!fs.existsSync(realPath)) {
-    console.error(`${realPath} not found`);
-    return "\nFile not found\n";
-  }
-
-  // read file content and split lines
-  const lines = fs
-    .readFileSync(realPath, { encoding: "utf-8" })
-    .replace(NEWLINE_RE, "\n")
-    .split("\n");
-  let results: string[] = [];
-
-  if ("region" in info) {
-    const region = findRegion(lines, info.region);
-    if (region) {
-      const { lineStart, lineEnd } = region;
-      results = lines.slice(lineStart, lineEnd);
-    }
-  } else {
-    const { lineStart, lineEnd } = info;
-    if (lineStart) {
-      results = lines.slice(lineStart - 1, lineEnd);
-    } else {
-      results = lines.slice(0, lineEnd);
-    }
-  }
-
-  if (realPath.endsWith(".md")) {
-    const dirName = path.dirname(realPath);
-
-    results.unshift(`<!-- #include-env-start: ${dirName} -->`);
-    results.push("<!-- #include-env-end -->");
-  }
-
-  return dedent(results.join("\n").replace(/\n?$/, "\n"));
-};
-
-export const resolveInclude = (content: string, { cwd }: IncludeInfo): string =>
-  content.replaceAll(
-    INCLUDE_RE,
-    (
-      _,
-      indent: string,
-      includePath: string,
-      region?: string,
-      lineStart?: string,
-      lineEnd?: string,
-    ) => {
-      if (!region && !lineStart && !lineEnd) {
-        throw new Error(`Syntax error: Missing lineStart or lineEnd`);
-      } else if (!path.isAbsolute(cwd)) {
-        throw new Error(`Require the <cwd> option is an absolute path`);
+    if (!src) {
+      // try to parse again, if successful, set token and recursion
+      const result = syntaxMatcher(token.content);
+      if (result) {
+        setToken(token, result);
+        token.src = result;
+        return render(...args);
+      } else {
+        return fenceRender(...args);
       }
-      const actualPath = path.resolve(cwd, includePath);
-      const content = handleInclude(
-        {
-          filePath: actualPath,
-          ...(region
-            ? { region }
-            : {
-                ...(lineStart ? { lineStart: Number(lineStart ?? "0") } : {}),
-                ...(lineEnd ? { lineEnd: Number(lineEnd ?? "0") } : {}),
-              }),
-        },
-        { cwd },
-      );
+    }
 
-      return content
-        .split("\n")
-        .map((line) => indent + line)
-        .join("\n");
-    },
-  );
+    if (!env?.cwd || !path.isAbsolute(env.cwd)) {
+      console.warn(
+        `[markdwon-it-mdBook] ${env.cwd} is not a valid path or absolute path`,
+      );
+      token.content = `[markdwon-it-mdBook] unresolved file: ${src.filepath}`;
+      return fenceRender(...args);
+    }
+
+    const stat = fs.statSync(env.cwd);
+    const filepath = path.join(
+      stat.isDirectory() ? env.cwd : path.dirname(env.cwd),
+      `./${src.filepath}`,
+    );
+    if (!fs.existsSync(filepath)) {
+      // print absolute path for debugging
+      console.warn(`[markdwon-it-mdBook] ${filepath} is not found`);
+      token.content = `${src.filepath} is not found`;
+      return fenceRender(...args);
+    } else if (fs.statSync(filepath).isDirectory()) {
+      console.warn(
+        `[markdwon-it-mdBook] require file, but get a directory: ${src.filepath}`,
+      );
+      token.content = `require file, but get a directory: ${src.filepath}`;
+      return fenceRender(...args);
+    }
+    const fileContent = fs.readFileSync(filepath, {
+      encoding: "utf-8",
+    });
+
+    if (!src.anchor && !src.startLine && !src.endLine) {
+      token.content = fileContent;
+      return fenceRender(...args);
+    }
+
+    const includedLines = src.anchor
+      ? findLinesWithAnchor(fileContent.split("\n"), src.anchor)
+      : findLines(
+          fileContent.split("\n"),
+          src.startLine,
+          src.endLine,
+          src.excludeMode,
+        );
+
+    token.content = includedLines.join("\n");
+
+    return fenceRender(...args);
+  };
+
+  md.block.ruler.before("paragraph", ruleName, parser);
+  md.renderer.rules[ruleName] = render;
+}
+
+export function syntaxMatcher(line: string) {
+  let [, filepath, lang, anchor, startLine, endLine] =
+    INCLUDE_RE.exec(line.trim()) || [];
+
+  if (!filepath) return null;
+
+  // The lines between startLine and endLine will be excluded
+  let excludeMode = false;
+  if (!anchor) {
+    if (startLine && startLine !== ":" && endLine === ":") {
+      const start = parseInt(startLine.slice(1));
+      startLine = ":";
+      endLine = `:${start - 1}`;
+      excludeMode = true;
+    }
+    startLine = startLine?.slice(1) || "0";
+    // if endLine is undefined, it defaults to startLine, which will only import one line
+    endLine = endLine?.slice(1) || startLine;
+  }
+
+  return {
+    filepath,
+    lang,
+    anchor,
+    startLine,
+    endLine,
+    excludeMode,
+  };
+}
+
+export function findLinesWithAnchor(lines: string[], anchor: string) {
+  let RE = null;
+  const pos = { start: -1, end: -1 };
+
+  lines.forEach((line, i) => {
+    if (!RE) {
+      const anchorRE = ANCHOR_RE_LIST.find((re) => re.test(line));
+      const [, anchor_tag, anchor_name] = anchorRE?.exec(line) ?? [];
+      if (!anchor_tag || anchor_name !== anchor) {
+        return;
+      } else {
+        RE = anchorRE;
+      }
+    }
+
+    const [_, tag, name] = RE.exec(line) ?? [];
+    if (!tag || name !== anchor) {
+      return;
+    }
+
+    if (!tag.endsWith("_END")) {
+      pos.start = i + 1;
+    } else if (tag.endsWith("_END") && pos.start >= 0) {
+      pos.end = i;
+    }
+  });
+
+  if (pos.start < 0 || pos.end < 0) {
+    return [];
+  }
+
+  return lines.slice(pos.start, pos.end);
+}
+
+export function findLines(
+  lines: string[],
+  start: number | string,
+  end: number | string,
+  excludeMode?: boolean,
+) {
+  const startLine = parseInt(start.toString());
+  const endLine = parseInt(end.toString());
+
+  if (startLine < 0 || endLine < 0) {
+    throw [];
+  }
+
+  if (excludeMode) {
+    return [...lines.slice(0, startLine), ...lines.slice(endLine + 1)];
+  }
+
+  return lines.slice(startLine, endLine + 1);
+}
