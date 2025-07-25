@@ -21,9 +21,43 @@ export default defineConfig({
       md.use(mdBookPlugin)
     }
   }
-  // ...your other configurations
+  // ...your configurations
 })
 ```
+
+The plugin supports the `book.toml` file, it will be used to configure the mdBook plugin.
+
+> Currently, the plugin unsupport to parse the `book.toml` file directly, you can use the [smol-toml](https://github.com/squirrelchat/smol-toml) to parse toml file and pass the result to the plugin.
+
+For example, you can configure a hidden prefix for a specific language:
+
+```ts
+const bookOptions = {
+  output: {
+    html: {
+      code: {
+        hidelines: { python: "~" }, // Use the `~` as the hidden prefix for Python.
+      },
+    },
+  },
+};
+
+md.use(mdBookPlugin, bookOptions)
+```
+
+
+### Including files
+If you want to use the **including-files** feature, you must specify the `cwd` option in the `env` parameter when calling the `md.render`.
+
+Example:
+
+```ts
+md.render('{{# file.rs}}', { cwd: 'filepath/dir' })
+```
+
+The cwd will be used to resolve the path of the reference file.
+
+If render content without **including-files** feature, you can ignore it.
 
 ## Roadmap
 - [x] Hiding code lines
