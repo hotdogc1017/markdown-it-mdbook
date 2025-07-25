@@ -9,6 +9,10 @@
     "test": "vitest run",
     "test:update": "vitest -u"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "files": [
     "dist"
   ],
