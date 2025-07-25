@@ -6,7 +6,6 @@ import {
 } from "./utils";
 import MarkdownIt from "markdown-it";
 import Token from "markdown-it/lib/token.mjs";
-import type { RuleBlock } from "markdown-it/lib/parser_block.mjs";
 import path from "node:path";
 import fs from "node:fs";
 

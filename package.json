@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsdown --minify",
+    "bump": "bumpp --sign",
     "test": "vitest run",
     "test:update": "vitest -u"
   },
@@ -23,8 +25,10 @@
     "@types/markdown-it": "^14.1.2",
     "@types/markdown-it-container": "^2.0.10",
     "@types/node": "^24.0.15",
+    "bumpp": "^10.2.0",
     "markdown-it": "^14.1.0",
     "markdown-it-container": "^4.0.0",
+    "tsdown": "^0.13.0",
     "vitest": "^3.2.4"
   }
 }
