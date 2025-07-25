@@ -12,6 +12,9 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "keywords": [
     "markdown-it",
     "mdbook",
