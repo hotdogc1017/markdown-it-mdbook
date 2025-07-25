@@ -9,6 +9,9 @@
     "test": "vitest run",
     "test:update": "vitest -u"
   },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "markdown-it",
     "mdbook",
