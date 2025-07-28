@@ -55,6 +55,28 @@ Example:
 md.render('{{# file.rs}}', { cwd: 'filepath/dir' })
 ```
 
+You can also provide a path for resolving the reference file via the `getRelatedPath` function.
+
+Using `Vitepress` as an example:
+
+```ts
+import { type MarkdownEnv } from "vitepress";
+
+export default {
+  // ...your other configurations
+  markdown: {
+    config(md) {
+      md.use(mdBookPlugin, {
+        getRelatedPath: (env: MarkdownEnv) => {
+          const { realPath, path: _path } = env;
+          return path.dirname(realPath ?? _path);
+        },
+      });
+    },
+  },
+}
+```
+
 The cwd will be used to resolve the path of the reference file.
 
 If render content without **including-files** feature, you can ignore it.
