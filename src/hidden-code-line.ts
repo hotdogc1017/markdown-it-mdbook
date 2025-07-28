@@ -28,6 +28,7 @@ export function hiddenCodeLinePlugin(
     const lines = token.content
       .split("\n")
       .filter((line) => !RE.test(line.trim()));
+    token.info = `${lang}`;
     token.content = lines.join("\n");
     return originalRender(...args);
   };
