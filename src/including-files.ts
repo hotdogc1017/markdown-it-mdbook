@@ -1,13 +1,17 @@
 import {
   createBlockRuleParser,
+  warn,
   type ParserArgs,
   type RenderArgs,
   type TokenWithMeta,
 } from "./utils";
 import MarkdownIt from "markdown-it";
-import Token from "markdown-it/lib/token.mjs";
 import path from "node:path";
 import fs from "node:fs";
+
+export type IncludingFilesPluginOptions = {
+  getRelatedPath?: (env: any) => string;
+};
 
 /**
  * Rust needs to be supported for now.
@@ -31,8 +35,12 @@ const ANCHOR_RE_LIST = [
 export const INCLUDE_RE =
   /^\s*\{{2}#include\s([^<>|:"*?]+(?:\.([a-z0-9]+)))(?::?([a-zA-Z]+))?(:\d*)?(:\d*)?\}{2}\s*$/;
 
-export function includingFilesPlugin(md: MarkdownIt) {
+export function includingFilesPlugin(
+  md: MarkdownIt,
+  options?: IncludingFilesPluginOptions,
+) {
   type MatchResult = ReturnType<typeof syntaxMatcher>;
+  const { getRelatedPath } = options || {};
   const ruleName = "fence";
 
   const setToken = (token: TokenWithMeta<MatchResult>, match: MatchResult) => {
@@ -55,40 +63,40 @@ export function includingFilesPlugin(md: MarkdownIt) {
   const render = (...args: RenderArgs<MatchResult, { cwd: string }>) => {
     const [tokens, idx, , env] = args;
     const token = tokens[idx];
-    const { src } = token;
+    const { __src__: src } = token;
 
     if (!src) {
       // try to parse again, if successful, set token and recursion
       const result = syntaxMatcher(token.content);
       if (result) {
         setToken(token, result);
-        token.src = result;
+        token.__src__ = result;
         return render(...args);
       } else {
         return fenceRender(...args);
       }
     }
 
-    if (!env?.cwd || !path.isAbsolute(env.cwd)) {
-      console.warn(
-        `[markdwon-it-mdBook] ${env.cwd} is not a valid path or absolute path`,
-      );
+    const cwd = getRelatedPath?.(env) ?? env.cwd;
+    if (!cwd || !path.isAbsolute(cwd)) {
+      warn(`[markdwon-it-mdBook] ${cwd} is not a valid path or absolute path`);
       token.content = `[markdwon-it-mdBook] unresolved file: ${src.filepath}`;
       return fenceRender(...args);
     }
 
-    const stat = fs.statSync(env.cwd);
+    const stat = fs.statSync(cwd);
     const filepath = path.join(
-      stat.isDirectory() ? env.cwd : path.dirname(env.cwd),
+      stat.isDirectory() ? cwd : path.dirname(cwd),
       `./${src.filepath}`,
     );
+
     if (!fs.existsSync(filepath)) {
       // print absolute path for debugging
       console.warn(`[markdwon-it-mdBook] ${filepath} is not found`);
       token.content = `${src.filepath} is not found`;
       return fenceRender(...args);
     } else if (fs.statSync(filepath).isDirectory()) {
-      console.warn(
+      warn(
         `[markdwon-it-mdBook] require file, but get a directory: ${src.filepath}`,
       );
       token.content = `require file, but get a directory: ${src.filepath}`;

@@ -1,14 +1,14 @@
 import { hiddenCodeLinePlugin } from "./hidden-code-line";
-import { includingFilesPlugin } from "./including-files";
+import {
+  includingFilesPlugin,
+  IncludingFilesPluginOptions,
+} from "./including-files";
 import type { BookOptions } from "./types";
 import MarkdownIt from "markdown-it";
 
-export interface MdBookPluginOptions {
-  bookOptions: BookOptions;
-}
+export type MdBookPluginOptions = IncludingFilesPluginOptions & BookOptions;
 
 export function mdBookPlugin(md: MarkdownIt, options?: MdBookPluginOptions) {
-  const { bookOptions } = options || {};
-  md.use(hiddenCodeLinePlugin, bookOptions);
-  md.use(includingFilesPlugin);
+  md.use(hiddenCodeLinePlugin, options);
+  md.use(includingFilesPlugin, options);
 }

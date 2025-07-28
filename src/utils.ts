@@ -1,6 +1,7 @@
 import Renderer from "markdown-it/lib/renderer.mjs";
 import StateBlock from "markdown-it/lib/rules_block/state_block.mjs";
 import Token from "markdown-it/lib/token.mjs";
+import pc from "picocolors";
 
 interface CreateBlockRuleParserOptions {
   ruleName: string;
@@ -21,7 +22,7 @@ export type RenderArgs<T = any, E = any> = [
 /**
  * Specify the type of meta in the token for content
  */
-export type TokenWithMeta<T = any> = Token & { src: T };
+export type TokenWithMeta<T = any> = Token & { __src__: T };
 
 /**
  * !!!NOTE: 仅适合创建不需要跨行解析的语法
@@ -56,9 +57,13 @@ export function createBlockRuleParser({
   }
   const token = state.push(ruleName, "", 1) as TokenWithMeta;
   token.map = [startLine, startLine + 1];
-  token.src = match;
+  token.__src__ = match;
   setToken?.(token, match);
 
   state.line = startLine + 1;
   return true;
+}
+
+export function warn(message: string) {
+  console.warn(pc.yellow(message));
 }
