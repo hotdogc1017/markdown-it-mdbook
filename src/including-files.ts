@@ -19,21 +19,21 @@ export type IncludingFilesPluginOptions = {
  * Captures: [anchor_tag, anchor]
  */
 const ANCHOR_RE_LIST = [
-  /^\/\/+ #?(ANCHOR(?:_END)?): ([a-zA-Z]+)$/, // javascript, typescript, java, Rust
-  /^\/\* ?#(ANCHOR(?:_END)?): ([a-zA-Z]+) ?\*\/$/, // css, less, scss
-  /^#pragma (ANCHOR(?:_END)?): ([a-zA-Z]+)$/, // C, C++
-  /^<!-- #?(ANCHOR(?:_END)?): ([a-zA-Z]+) -->$/, // HTML, markdown
-  /^#(ANCHOR(?:_END )): ([a-zA-Z]+)$/, // Visual Basic
-  /^::#(ANCHOR(?:_END)): ([a-zA-Z]+)$/, // Bat
-  /^# ?(ANCHOR(?:_END)?): ([a-zA-Z]+)$/, // C#, PHP, Powershell, Python, perl & misc
-  /^\/\* (ANCHOR(?:_END)?): ([a-zA-Z]+) \*\/$/, // Rust
+  /\/\/+ #?(ANCHOR(?:_END)?): ([a-zA-Z-_]+)/, // javascript, typescript, java, Rust
+  /\/\* ?#(ANCHOR(?:_END)?): ([a-zA-Z-_]+) ?\*\//, // css, less, scss
+  /#pragma (ANCHOR(?:_END)?): ([a-zA-Z-_]+)/, // C, C++
+  /<!-- #?(ANCHOR(?:_END)?): ([a-zA-Z-_]+) -->/, // HTML, markdown
+  /#(ANCHOR(?:_END )): ([a-zA-Z-_]+)/, // Visual Basic
+  /::#(ANCHOR(?:_END)): ([a-zA-Z-_]+)/, // Bat
+  /# ?(ANCHOR(?:_END)?): ([a-zA-Z-_]+)/, // C#, PHP, Powershell, Python, perl & misc
+  /\/\* (ANCHOR(?:_END)?): ([a-zA-Z-_]+) \*\//, // Rust
 ];
 
 /**
  * Captures: [filepath, lang, anchor, startLine, endLine]
  */
 export const INCLUDE_RE =
-  /^\s*\{{2}#(?:include|rustdoc_include|playground)\s([^<>|:"*?]+(?:\.([a-z0-9]+)))(?::?([a-zA-Z]+))?(:\d*)?(:\d*)?\}{2}\s*$/;
+  /^\s*\{{2}#(?:include|rustdoc_include|playground)\s([^<>|:"*?]+(?:\.([a-z0-9]+)))(?::?([a-zA-Z-_]+))?(:\d*)?(:\d*)?\}{2}\s*$/;
 
 export function includingFilesPlugin(
   md: MarkdownIt,
