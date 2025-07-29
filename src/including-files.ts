@@ -33,7 +33,7 @@ const ANCHOR_RE_LIST = [
  * Captures: [filepath, lang, anchor, startLine, endLine]
  */
 export const INCLUDE_RE =
-  /^\s*\{{2}#include\s([^<>|:"*?]+(?:\.([a-z0-9]+)))(?::?([a-zA-Z]+))?(:\d*)?(:\d*)?\}{2}\s*$/;
+  /^\s*\{{2}#(?:include|rustdoc_include|playground)\s([^<>|:"*?]+(?:\.([a-z0-9]+)))(?::?([a-zA-Z]+))?(:\d*)?(:\d*)?\}{2}\s*$/;
 
 export function includingFilesPlugin(
   md: MarkdownIt,
