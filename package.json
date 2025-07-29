@@ -39,7 +39,6 @@
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^24.0.15",
     "bumpp": "^10.2.0",
-    "markdown-it": "^14.1.0",
     "picocolors": "^1.1.1",
     "pnpm": "^10.13.1",
     "tsdown": "^0.13.0",
