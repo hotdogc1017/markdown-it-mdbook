@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsdown -w --dts",
     "build": "tsdown --minify --dts",
+    "pub": "pnpm build && pnpm publish",
     "bump": "bumpp --sign",
     "test": "vitest run",
     "test:update": "vitest -u"
@@ -40,6 +41,7 @@
     "bumpp": "^10.2.0",
     "markdown-it": "^14.1.0",
     "picocolors": "^1.1.1",
+    "pnpm": "^10.13.1",
     "tsdown": "^0.13.0",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
