@@ -106,7 +106,11 @@ export function includingFilesPlugin(
       encoding: "utf-8",
     });
 
-    if (!src.anchor && !src.startLine && !src.endLine) {
+    if (
+      !src.anchor &&
+      (!src.startLine || src.startLine === "0") &&
+      (!src.endLine || src.endLine === "0")
+    ) {
       token.content = fileContent;
       return fenceRender(...args);
     }
