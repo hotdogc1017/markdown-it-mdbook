@@ -49,7 +49,40 @@ exports[`Regexp and utils tests > find lines with anchor test 3`] = `
 `;
 
 exports[`including-files plugin test > output html with the \`cwd\` in env 1`] = `
-"<pre><code class="language-rs">}</code></pre>
+"<pre><code class="language-rs">struct Paddle {</code></pre>
+<pre><code class="language-rs">}</code></pre>
+<pre><code class="language-rs">struct Paddle {
+    hello: f32,
+}
+
+impl System for MySystem { ... }
+</code></pre>
+<pre><code class="language-rs">}
+
+impl System for MySystem { ... }
+</code></pre>
+<pre><code class="language-rs">}
+
+impl System for MySystem { ... }
+</code></pre>
+<pre><code class="language-rs">struct Paddle {</code></pre>
+<pre><code class="language-rs">}</code></pre>
+<pre><code class="language-rs">struct Paddle {
+    hello: f32,
+}
+
+impl System for MySystem { ... }
+</code></pre>
+<pre><code class="language-rs">}
+
+impl System for MySystem { ... }
+</code></pre>
+<pre><code class="language-rs">}
+
+impl System for MySystem { ... }
+</code></pre>
+<pre><code class="language-rs">struct Paddle {</code></pre>
+<pre><code class="language-rs">}</code></pre>
 <pre><code class="language-rs">struct Paddle {
     hello: f32,
 }
@@ -87,6 +120,17 @@ impl System for MySystem { ... }
 
 exports[`including-files plugin test > output html without the \`cwd\` in env 1`] = `
 "<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
+<pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
 <pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
 <pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>
 <pre><code class="language-rs">[markdwon-it-mdBook] unresolved file: including_files.rs</code></pre>

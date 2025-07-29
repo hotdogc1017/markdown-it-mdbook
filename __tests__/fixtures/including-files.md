@@ -1,7 +1,34 @@
+{{#include including_files.rs}}
+
+```rust
 {{#include including_files.rs:2}}
+```
+
 {{#include including_files.rs::10}}
+
 {{#include including_files.rs:2:}}
+
 {{#include including_files.rs:2:10}}
+
+{{#rustdoc_include including_files.rs}}
+
+{{#rustdoc_include including_files.rs:2}}
+
+{{#rustdoc_include including_files.rs::10}}
+
+{{#rustdoc_include including_files.rs:2:}}
+
+{{#rustdoc_include including_files.rs:2:10}}
+
+{{#playground including_files.rs}}
+
+{{#playground including_files.rs:2}}
+
+{{#playground including_files.rs::10}}
+
+{{#playground including_files.rs:2:}}
+
+{{#playground including_files.rs:2:10}}
 
 Here is a component:
 ```rust,no_run,noplayground

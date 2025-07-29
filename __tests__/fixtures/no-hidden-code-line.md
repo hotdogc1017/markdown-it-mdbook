@@ -10,7 +10,7 @@ nothidden():
     nothidden()
 ```
 
-```python,hidelines=!!!
+```python
 nothidden():
     nothidden()
 ```

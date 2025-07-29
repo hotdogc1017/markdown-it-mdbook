@@ -14,12 +14,15 @@ describe("Regexp and utils tests", () => {
   test("regexp test", () => {
     /* prettier-ignore */
     const SYNTAX_SOURCES = {
+      "{{#include file.rs}}": ["file.rs", "rs", undefined, undefined, undefined],
       "{{#include file.rs:2}}": ["file.rs", "rs", undefined, ":2", undefined],
       "{{#include file.rs::10}}": ["file.rs", "rs", undefined, ":", ":10"],
       "{{#include file.rs:2:}}": ["file.rs", "rs", undefined, ":2", ":"],
       "{{#include file.rs:2:10}}": ["file.rs", "rs", undefined, ":2", ":10"],
       "{{#include file.rs:anchor}}": ["file.rs", "rs", "anchor", undefined, undefined],
       " {{#include file.rs:anchor}}": ["file.rs", "rs", "anchor", undefined, undefined],
+      "{{#rustdoc_include file.rs:2}}": ["file.rs", "rs", undefined, ":2", undefined],
+      "{{#playground file.rs:2}}": ["file.rs", "rs", undefined, ":2", undefined],
     };
     for (const [source, expectedValue] of Object.entries(SYNTAX_SOURCES)) {
       const [, ...value] = [...(source.match(INCLUDE_RE) ?? [])];
