@@ -50,5 +50,5 @@ export function parseInfo(info: string) {
 }
 
 function getGloabalPrefixMap(bookOptions?: BookOptions) {
-  return bookOptions?.output?.html?.code.hidelines ?? {};
+  return bookOptions?.output?.html?.code?.hidelines ?? {};
 }
